@@ -8,16 +8,31 @@ endif()
 # find dependencies
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
+find_package(std_msgs)
+find_package(rosidl_default_generators REQUIRED)
 
-add_executable(cpp_divider_node src/cpp_divider_node.cpp)
-target_include_directories(cpp_divider_node PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-  $<INSTALL_INTERFACE:include>)
-target_compile_features(cpp_divider_node PUBLIC c_std_99 cxx_std_17)  # Require C99 and C++17
-ament_target_dependencies(
-  cpp_divider_node
-  "rclcpp"
+set(msg_files
+  "msg/DivisionInputFloats.msg"
 )
+
+# generate message
+rosidl_generate_interfaces(${PROJECT_NAME}
+  ${msg_files}
+)
+
+# export message runtime dependency
+ament_export_dependencies(rosidl_default_runtime)
+
+set(cpp_source_files
+  src/cpp_divider_node.cpp
+)
+
+add_executable(cpp_divider_node ${cpp_source_files})
+ament_target_dependencies(cpp_divider_node rclcpp std_msgs)
+
+# link generated message source code
+rosidl_target_interfaces(cpp_divider_node
+  ${PROJECT_NAME} "rosidl_typesupport_cpp")
 
 install(TARGETS cpp_divider_node
   DESTINATION lib/${PROJECT_NAME})
