@@ -3,7 +3,7 @@
 <package format="3">
   <name>cpp_divider</name>
   <version>0.0.0</version>
-  <description>TODO: Package description</description>
+  <description>This package contains my solution of interview homework for Robotics Software Developer position.</description>
   <maintainer email="meggyesijano97@gmail.com">meggyesi</maintainer>
   <license>Apache-2.0</license>
 
