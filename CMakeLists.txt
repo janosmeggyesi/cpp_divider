@@ -8,7 +8,7 @@ endif()
 # find dependencies
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
-find_package(std_msgs)
+find_package(std_msgs REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
 
 set(msg_files
@@ -18,6 +18,7 @@ set(msg_files
 # generate message
 rosidl_generate_interfaces(${PROJECT_NAME}
   ${msg_files}
+  DEPENDENCIES std_msgs
 )
 
 # export message runtime dependency
@@ -25,16 +26,21 @@ ament_export_dependencies(rosidl_default_runtime)
 
 set(cpp_source_files
   src/cpp_divider_node.cpp
+  src/main.cpp
 )
 
-add_executable(cpp_divider_node ${cpp_source_files})
-ament_target_dependencies(cpp_divider_node rclcpp std_msgs)
+add_executable(${PROJECT_NAME}_node ${cpp_source_files})
+target_include_directories(${PROJECT_NAME}_node PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>)
+target_compile_features(${PROJECT_NAME}_node PUBLIC c_std_99 cxx_std_14)  # Require C99 and C++14
+ament_target_dependencies(${PROJECT_NAME}_node rclcpp std_msgs)
 
 # link generated message source code
-rosidl_target_interfaces(cpp_divider_node
+rosidl_target_interfaces(${PROJECT_NAME}_node
   ${PROJECT_NAME} "rosidl_typesupport_cpp")
 
-install(TARGETS cpp_divider_node
+install(TARGETS ${PROJECT_NAME}_node
   DESTINATION lib/${PROJECT_NAME})
 
 if(BUILD_TESTING)
